@@ -1,6 +1,6 @@
 module ValueHistoriesLH
 
-using DataStructures
+using DataStructures, DocStringExtensions
 # using RecipesBase
 
 import Base: isempty
@@ -14,6 +14,8 @@ export
         MVHistory,
         increment!,
     @trace
+
+export retrieve
 
 include("abstract.jl")
 include("history.jl")

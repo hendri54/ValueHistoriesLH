@@ -48,12 +48,20 @@ function Base.push!(
     value
 end
 
+
+# Returns a univalue history for a given key
 function Base.getindex(history::MVHistory, key::Symbol)
     history.storage[key]
 end
 
 Base.haskey(history::MVHistory, key::Symbol) = haskey(history.storage, key)
 
+
+"""
+	$(SIGNATURES)
+
+Retrieve the indices and values for a key as vectors.
+"""
 function Base.get(history::MVHistory, key::Symbol)
     l = length(history, key)
     k, v = first(history.storage[key])
@@ -67,6 +75,31 @@ function Base.get(history::MVHistory, key::Symbol)
     end
     karray, varray
 end
+
+
+"""
+	$(SIGNATURES)
+
+Retrieve the value for a key for a given index.
+Return `nothing` if not found, unless `notFoundError == true`.
+"""
+function retrieve(h :: MVHistory, key :: Symbol, idx;
+    notFoundError :: Bool = false)
+
+    idxV, valueV = get(h, key);
+    matchIdx = findfirst(x -> isequal(x, idx),  idxV);
+    if isnothing(matchIdx)
+        if notFoundError
+            error("Index $idx not found in key $key");
+        else
+            return nothing
+        end
+    else
+        return valueV[matchIdx]
+    end
+end
+
+
 
 function Base.show(io::IO, history::MVHistory{H}) where {H}
     print(io, "MVHistory{$H}")
@@ -112,7 +145,7 @@ Increments the value for a given key and iteration if it exists, otherwise adds 
 function increment!(trace::MVHistory{<:History}, key::Symbol, iter::Number, val)
     if haskey(trace, key)
         i = findfirst(isequal(iter), trace.storage[key].iterations)
-        if i != nothing
+        if !isnothing(i)
             return trace[key].values[i] += val
         end
     end

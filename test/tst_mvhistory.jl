@@ -1,3 +1,17 @@
+@testset "Retrieve" begin
+    h = MVHistory();
+    n = 7;
+    for j = 1 : n
+        push!(h, :x, j,  j*j);
+    end
+    for j = 1 : n
+        @test retrieve(h, :x, j) == j*j
+    end
+    @test isnothing(retrieve(h, :x, n+1))
+    @test_throws ErrorException retrieve(h, :x, n+1; notFoundError = true)
+end
+
+
 @testset "MVHistory: Basic functions" begin
     _history = MVHistory()
     @test isempty(_history)
