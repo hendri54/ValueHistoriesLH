@@ -1,3 +1,7 @@
+#=
+Stores a single object of type `V` for each iteration.
+`iterations` keep track of the indices (e.g. times) of the iterations.
+=#
 mutable struct History{I,V} <: UnivalueHistory{I}
     lastiter::I
     iterations::Vector{I}
@@ -14,6 +18,23 @@ Base.first(history::History) = history.iterations[1], history.values[1]
 Base.last(history::History) = history.iterations[end], history.values[end]
 Base.get(history::History) = history.iterations, history.values
 
+
+"""
+	$(SIGNATURES)
+
+Make a `UnivalueHistory` from a vector of values.
+
+test this +++++
+"""
+function make_history(valueV :: Vector)
+    h = History(eltype(valueV));
+    for (j, v) in valueV
+        push!(h, j, v);
+    end
+    return h
+end
+
+
 function Base.push!(
         history::History{I,V},
         iteration::I,
@@ -26,6 +47,7 @@ function Base.push!(
     value
 end
 
+# Add a history entry. Simply increment iteration counter by 1.
 function Base.push!(
         history::History{I,V},
         value::V) where {I,V}

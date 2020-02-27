@@ -1,4 +1,6 @@
-
+#=
+Each key is one "series" to be saved; say the function value in an optimization.
+=#
 struct MVHistory{H<:UnivalueHistory} <: MultivalueHistory
     storage::Dict{Symbol, H}
 end
@@ -14,7 +16,19 @@ Base.length(history::MVHistory, key::Symbol) = length(history.storage[key])
 Base.enumerate(history::MVHistory, key::Symbol) = enumerate(history.storage[key])
 Base.first(history::MVHistory, key::Symbol) = first(history.storage[key])
 Base.last(history::MVHistory, key::Symbol) = last(history.storage[key])
+
+"""
+	$(SIGNATURES)
+
+Returns the names of the "series" that are saved in the history as a vector.
+"""
 Base.keys(history::MVHistory) = keys(history.storage)
+
+"""
+	$(SIGNATURES)
+
+Returns the values for a specific "series" in the history as a vector.
+"""
 Base.values(history::MVHistory, key::Symbol) = get(history, key)[2]
 
 Base.isempty(h :: MVHistory)  =  isempty(h.storage);
