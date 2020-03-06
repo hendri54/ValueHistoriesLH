@@ -22,6 +22,23 @@ Base.get(history::History) = history.iterations, history.values
 """
 	$(SIGNATURES)
 
+Make a history into a `Dict{String,ValueType}`.
+The purpose is mainly to represent the history in a format that can be encoded as JSON.
+"""
+function history_to_dict(h :: History{I, V}) where {I, V}
+    d = Dict{String, V}();
+    n = length(h);
+    idxV, valueV = get(h);
+    for j = 1 : n
+        d[string(idxV[j])] = valueV[j]
+    end
+    return d
+end
+
+
+"""
+	$(SIGNATURES)
+
 Make a `UnivalueHistory` from a vector of values.
 
 test this +++++

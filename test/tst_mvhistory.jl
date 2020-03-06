@@ -1,14 +1,27 @@
-@testset "Retrieve" begin
-    h = MVHistory();
-    n = 7;
-    for j = 1 : n
-        push!(h, :x, j,  j*j);
+function dict_test()
+    @testset "Dict" begin
+        h = make_test_mvhistory(3);
+        idxV, valueV = get(h, :d);
+        d = history_to_dict(h, :d);
+        for j = 1 : length(idxV)
+            @test isapprox(valueV[j],  d[string(j)])
+        end
     end
-    for j = 1 : n
-        @test retrieve(h, :x, j) == j*j
+end
+
+function retrieve_test()
+    @testset "Retrieve" begin
+        h = MVHistory();
+        n = 7;
+        for j = 1 : n
+            push!(h, :x, j,  j*j);
+        end
+        for j = 1 : n
+            @test retrieve(h, :x, j) == j*j
+        end
+        @test isnothing(retrieve(h, :x, n+1))
+        @test_throws ErrorException retrieve(h, :x, n+1; notFoundError = true)
     end
-    @test isnothing(retrieve(h, :x, n+1))
-    @test_throws ErrorException retrieve(h, :x, n+1; notFoundError = true)
 end
 
 
@@ -126,3 +139,8 @@ end
     _history2 = MVHistory(QHistory)
     @test_throws MethodError increment!(_history2, key, 1, val) == val
 end
+
+retrieve_test();
+dict_test();
+
+# --------------

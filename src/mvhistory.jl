@@ -24,6 +24,8 @@ Returns the names of the "series" that are saved in the history as a vector.
 """
 Base.keys(history::MVHistory) = keys(history.storage)
 
+Base.haskey(h :: MVHistory) = Base.haskey(h.storage);
+
 """
 	$(SIGNATURES)
 
@@ -32,6 +34,21 @@ Returns the values for a specific "series" in the history as a vector.
 Base.values(history::MVHistory, key::Symbol) = get(history, key)[2]
 
 Base.isempty(h :: MVHistory)  =  isempty(h.storage);
+
+get_series(h :: MVHistory, key :: Symbol) = h.storage[key];
+
+
+"""
+	$(SIGNATURES)
+
+Add an entire univariate history to a `MultivalueHistory`.
+"""
+function add_series!(h :: MVHistory, key :: Symbol, sHist :: History)
+    @assert !haskey(h, key)  "Series $key already exists"
+    h.storage[key] = sHist;
+    return nothing
+end
+
 
 function Base.push!(
         history::MVHistory{H},
@@ -111,6 +128,16 @@ function retrieve(h :: MVHistory, key :: Symbol, idx;
     else
         return valueV[matchIdx]
     end
+end
+
+
+"""
+	$(SIGNATURES)
+
+Return one history (for one series) as a `Dict{String, V}`.
+"""
+function history_to_dict(h :: MVHistory, key :: Symbol)
+    return history_to_dict(get_series(h, key))
 end
 
 

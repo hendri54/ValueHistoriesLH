@@ -15,7 +15,7 @@ export
         increment!,
     @trace
 
-export retrieve
+export history_to_dict, retrieve
 
 include("abstract.jl")
 include("history.jl")

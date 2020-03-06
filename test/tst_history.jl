@@ -64,6 +64,21 @@ for T in [History, QHistory]
 end
 
 
+@testset "History to dict" begin
+    h = History(Float64);
+    n = 5;
+    valueV = [j * 2.5  for j = 1 : n];
+    for j = 1 : n
+        push!(h, j,  valueV[j]);
+    end
+
+    d = history_to_dict(h);
+    for j = 1 : n
+        @test isapprox(valueV[j],  d[string(j)])
+    end
+end
+
+
 @testset "History: increment!" begin
     _history = History(Float64)
     val = 1.

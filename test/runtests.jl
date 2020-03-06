@@ -1,6 +1,8 @@
 using ValueHistoriesLH
 using Test
 
+include("test_setup.jl")
+
 tests = [
     "tst_history.jl"
     "tst_mvhistory.jl"
@@ -21,6 +23,8 @@ end
 #         include(p)
 #     end
 # end
+
+
 
 
 # -----------
