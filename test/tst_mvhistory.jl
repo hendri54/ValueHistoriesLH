@@ -47,7 +47,7 @@ end
     println(_history)
     show(_history); println()
 
-    @test_throws ArgumentError push!(_history, :myf, 200, "test")
+    @test_throws AssertionError push!(_history, :myf, 200, "test")
 
     for k in keys(_history)
         @test k in [:myf, :myint, :myint2]

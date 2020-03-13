@@ -17,7 +17,7 @@ Base.enumerate(history::History) = zip(history.iterations, history.values)
 Base.first(history::History) = history.iterations[1], history.values[1]
 Base.last(history::History) = history.iterations[end], history.values[end]
 Base.get(history::History) = history.iterations, history.values
-
+Base.eltype(history :: History) = eltype(history.values);
 
 """
 	$(SIGNATURES)

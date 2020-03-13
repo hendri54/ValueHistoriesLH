@@ -55,11 +55,16 @@ function Base.push!(
         key::Symbol,
         iteration::I,
         value::V) where {I,H<:UnivalueHistory,V}
+
     if !haskey(history.storage, key)
         _hist = H(V, I)
         push!(_hist, iteration, value)
         history.storage[key] = _hist
     else
+        @assert isa(value,  eltype(history.storage[key]))  """
+            Unexpected type: $(eltype(value)) 
+            in history $key of type $(eltype(history.storage[key]))
+            """
         push!(history.storage[key], iteration, value)
     end
     value
@@ -69,6 +74,7 @@ function Base.push!(
         history::MVHistory{H},
         key::Symbol,
         value::V) where {H<:UnivalueHistory,V}
+
     if !haskey(history.storage, key)
         _hist = H(V, Int)
         push!(_hist, value)
