@@ -198,3 +198,5 @@ function increment!(trace::MVHistory{<:History}, key::Symbol, iter::Number, val)
     end
     push!(trace, key, iter, val)
 end
+
+# ------------

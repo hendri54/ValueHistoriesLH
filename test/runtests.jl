@@ -16,6 +16,8 @@ for t in tests
     @testset "[->] $t" begin
         include(t)
     end
+
+    include("load_save_test.jl")
 end
 
 # for p in perf

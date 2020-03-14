@@ -4,7 +4,7 @@ function make_test_history(n :: Integer, dimV; offSet :: Float64 = 0.0)
     h = History(Array{Float64});
     nEl = prod(dimV);
     for j = 1 : n
-        v = reshape(1 : nEl, dimV...) .+ offSet;
+        v = reshape(1 : nEl, dimV...) .+ offSet .+ j;
         push!(h, j, v);
     end
     return h
@@ -21,5 +21,9 @@ function make_test_mvhistory(n :: Integer)
     return h
 end
 
+
+test_dir() = joinpath(@__DIR__, "test_files");
+
+mkpath(test_dir());
 
 # ---------------

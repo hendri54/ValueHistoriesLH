@@ -18,6 +18,19 @@ Base.first(history::History) = history.iterations[1], history.values[1]
 Base.last(history::History) = history.iterations[end], history.values[end]
 Base.get(history::History) = history.iterations, history.values
 Base.eltype(history :: History) = eltype(history.values);
+Base.values(h :: History) = h.values;
+indices(h :: History) = h.iterations;
+
+function Base.getindex(h :: History, idx)
+    idxOut = findfirst(x -> isequal(x, idx),  indices(h));
+    if isnothing(idxOut)
+        return nothing
+    else
+        return values(h)[idxOut];
+    end
+end
+
+
 
 """
 	$(SIGNATURES)
@@ -40,12 +53,10 @@ end
 	$(SIGNATURES)
 
 Make a `UnivalueHistory` from a vector of values.
-
-test this +++++
 """
 function make_history(valueV :: Vector)
     h = History(eltype(valueV));
-    for (j, v) in valueV
+    for (j, v) in enumerate(valueV)
         push!(h, j, v);
     end
     return h
@@ -102,3 +113,6 @@ function increment!(trace::History{I,V}, iter::Number, val)  where {I,V}
     end
     push!(trace, iter, val)
 end
+
+
+# ----------------
