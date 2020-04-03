@@ -12,6 +12,11 @@ end
 # ====================================================================
 # Functions
 
+Base.isempty(h :: MVHistory)  =  isempty(h.storage);
+
+
+## ---------  Retrieve one series
+
 Base.length(history::MVHistory, key::Symbol) = length(history.storage[key])
 Base.enumerate(history::MVHistory, key::Symbol) = enumerate(history.storage[key])
 Base.first(history::MVHistory, key::Symbol) = first(history.storage[key])
@@ -22,76 +27,33 @@ Base.last(history::MVHistory, key::Symbol) = last(history.storage[key])
 
 Returns the names of the "series" that are saved in the history as a vector.
 """
-Base.keys(history::MVHistory) = keys(history.storage)
+Base.keys(history::MVHistory) = keys(history.storage);
 
-Base.haskey(h :: MVHistory) = Base.haskey(h.storage);
+series_names(h :: MVHistory) = keys(history.storage);
+
+# Base.haskey(h :: MVHistory) = Base.haskey(h.storage);
 
 """
 	$(SIGNATURES)
 
 Returns the values for a specific "series" in the history as a vector.
 """
-Base.values(history::MVHistory, key::Symbol) = get(history, key)[2]
+Base.values(history::MVHistory, key::Symbol) = values(get_series(history, key));
+# get(history, key)[2]
 
-Base.isempty(h :: MVHistory)  =  isempty(h.storage);
-
+# Retrieve a univalue history
 get_series(h :: MVHistory, key :: Symbol) = h.storage[key];
 
 
-"""
-	$(SIGNATURES)
-
-Add an entire univariate history to a `MultivalueHistory`.
-"""
-function add_series!(h :: MVHistory, key :: Symbol, sHist :: History)
-    @assert !haskey(h, key)  "Series $key already exists"
-    h.storage[key] = sHist;
-    return nothing
-end
-
-
-function Base.push!(
-        history::MVHistory{H},
-        key::Symbol,
-        iteration::I,
-        value::V) where {I,H<:UnivalueHistory,V}
-
-    if !haskey(history.storage, key)
-        _hist = H(V, I)
-        push!(_hist, iteration, value)
-        history.storage[key] = _hist
-    else
-        @assert isa(value,  eltype(history.storage[key]))  """
-            Unexpected type: $(eltype(value)) 
-            in history $key of type $(eltype(history.storage[key]))
-            """
-        push!(history.storage[key], iteration, value)
-    end
-    value
-end
-
-function Base.push!(
-        history::MVHistory{H},
-        key::Symbol,
-        value::V) where {H<:UnivalueHistory,V}
-
-    if !haskey(history.storage, key)
-        _hist = H(V, Int)
-        push!(_hist, value)
-        history.storage[key] = _hist
-    else
-        push!(history.storage[key], value)
-    end
-    value
-end
-
-
 # Returns a univalue history for a given key
-function Base.getindex(history::MVHistory, key::Symbol)
-    history.storage[key]
-end
+# So we can write h[:key]
+Base.getindex(history::MVHistory, key::Symbol) =  history.storage[key]
 
-Base.haskey(history::MVHistory, key::Symbol) = haskey(history.storage, key)
+# Does a given series exist?
+# Base.haskey(history::MVHistory, key::Symbol) = haskey(history.storage, key);
+
+# The same with a better name
+has_series(h :: MVHistory, sName :: Symbol) = haskey(h.storage, sName);
 
 
 """
@@ -136,6 +98,59 @@ function retrieve(h :: MVHistory, key :: Symbol, idx;
     end
 end
 
+
+
+## ------------  Adding to a history
+
+"""
+	$(SIGNATURES)
+
+Add an entire univariate history to a `MultivalueHistory`.
+"""
+function add_series!(h :: MVHistory, key :: Symbol, sHist :: History)
+    @assert !has_series(h, key)  "Series $key already exists"
+    h.storage[key] = sHist;
+    return nothing
+end
+
+
+function Base.push!(
+        history::MVHistory{H},
+        key::Symbol,
+        iteration::I,
+        value::V) where {I,H<:UnivalueHistory,V}
+
+    if !has_series(history, key)
+        _hist = H(V, I)
+        push!(_hist, iteration, value)
+        history.storage[key] = _hist
+    else
+        @assert isa(value,  eltype(history.storage[key]))  """
+            Unexpected type: $(eltype(value)) 
+            in history $key of type $(eltype(history.storage[key]))
+            """
+        push!(history.storage[key], iteration, value)
+    end
+    value
+end
+
+function Base.push!(
+        history::MVHistory{H},
+        key::Symbol,
+        value::V) where {H<:UnivalueHistory,V}
+
+    if !has_series(history, key)
+        _hist = H(V, Int)
+        push!(_hist, value)
+        history.storage[key] = _hist
+    else
+        push!(history.storage[key], value)
+    end
+    value
+end
+
+
+## --------------  Other
 
 """
 	$(SIGNATURES)
@@ -190,7 +205,7 @@ end
 Increments the value for a given key and iteration if it exists, otherwise adds the key/iteration pair with an ordinary push.
 """
 function increment!(trace::MVHistory{<:History}, key::Symbol, iter::Number, val)
-    if haskey(trace, key)
+    if has_series(trace, key)
         i = findfirst(isequal(iter), trace.storage[key].iterations)
         if !isnothing(i)
             return trace[key].values[i] += val

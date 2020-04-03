@@ -113,14 +113,14 @@ end
         @test @trace(_history, i, xi, round(Int,xi)) == round(Int,xi)
     end
 
-    @test haskey(_history, :xi)
+    @test has_series(_history, :xi)
     a1, a2 = get(_history, :xi)
     @test length(a1) == n
     @test length(a2) == n
     @test typeof(a1) <: Vector{Int}
     @test typeof(a2) <: Vector{Float64}
 
-    @test haskey(_history, Symbol("round(Int, xi)"))
+    @test has_series(_history, Symbol("round(Int, xi)"))
     a1, a2 = get(_history, Symbol("round(Int, xi)"))
     @test length(a1) == n
     @test length(a2) == n

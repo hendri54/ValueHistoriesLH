@@ -15,7 +15,12 @@ export
         increment!,
     @trace
 
+
+# MVHistory
+export has_series, series_names    
 export history_to_dict, retrieve, load_history, save_history, load_mvhistory, save_mvhistory
+# Single valued histories
+export indices
 
 include("abstract.jl")
 include("history.jl")
