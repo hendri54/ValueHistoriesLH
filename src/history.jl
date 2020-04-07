@@ -54,10 +54,10 @@ end
 
 Make a `UnivalueHistory` from a vector of values.
 """
-function make_history(valueV :: Vector)
+function make_history(idxV, valueV :: Vector)
     h = History(eltype(valueV));
     for (j, v) in enumerate(valueV)
-        push!(h, j, v);
+        push!(h, idxV[j], v);
     end
     return h
 end

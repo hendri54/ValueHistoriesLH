@@ -65,7 +65,7 @@ function load_meta(fPath :: AbstractString; notFoundError :: Bool = true)
         end
     end
     d = load_dict(metaPath);
-    v = dict_to_vector(d);
+    _, v = dict_to_vector(d);
     v = Symbol.(v);
     return v :: Vector{Symbol}
 end
@@ -154,8 +154,8 @@ Due to a JSON limitation, matrices are flattened into Vectors.
 """
 function load_history(fPath)
     d = load_dict(fPath);
-    valueV = dict_to_vector(d);
-    h = make_history(valueV);
+    idxV, valueV = dict_to_vector(d);
+    h = make_history(idxV, valueV);
     return h
 end
 
@@ -175,21 +175,43 @@ end
 
 
 # Convert a loaded `Dict` into a `Vector`.
-# Assumes keys are sequential integers.
+# Assumes keys are sequential integers. But stored as `Symbol{String}` (b/c of JSON3).
 # JSON arrays are made into ordinary arrays.
 function dict_to_vector(d :: T1) where T1 <: AbstractDict
-    n = length(keys(d));
+    n = length(d);
+    keyV = sort(key_to_int.(collect(keys(d))));
+    @assert all(x -> x > 0, keyV)
     # Because each value can be stored as a different type, start with `Vector{Any}`.
+    idxV = Vector{Int}(undef, n);
     v = Vector{Any}(undef, n);
-    for j = 1 : n
-        v[j] = d[string(j)];
+    for (j, k) in enumerate(keyV)
+        v[j] = d[int_to_key(k)];
     end
     
     # Promote to common type
     vOut = collect(promote(v...));
     # Make JSON3 arrays into ordinary arrays
     vOut = convert_json_array(vOut);
-	return vOut
+	return keyV, vOut
+end
+
+
+# Convert a JSON key to an Int
+key_to_int(k) = parse(Int, string(k));
+
+int_to_key(j :: Integer) = string(j);
+
+# Find the largest key in a `Dict`
+function largest_key(d :: T1) where T1 <: AbstractDict
+    kMax = -100;
+    for k in keys(d)
+        kInt = key_to_int(k);
+        @assert kInt > 0
+        @assert isa(kInt, Integer)
+        (kInt > kMax)  &&  (kMax = kInt);
+    end
+    @assert kMax > 1
+    return kMax
 end
 
 

@@ -5,7 +5,7 @@ using ValueHistoriesLH, Test
 
 function load_uni_test()
     @testset "Univalue history" begin
-        h = make_test_history(3, [2,3]);
+        h = make_test_history(3, [2,3]; keySpacing = 3);
         fPath = joinpath(test_dir(),  "save_history_test");
 
         sName = :test1;
