@@ -29,7 +29,7 @@ Returns the names of the "series" that are saved in the history as a vector.
 """
 Base.keys(history::MVHistory) = keys(history.storage);
 
-series_names(h :: MVHistory) = keys(history.storage);
+series_names(history :: MVHistory) = keys(history.storage);
 
 # Base.haskey(h :: MVHistory) = Base.haskey(h.storage);
 
